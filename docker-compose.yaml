@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  webrtc-connectivity-check-server:
+    container_name: "webrtc-connectivity-check-server"
+    image: "webrtc-connectivity-check-server"
+    build: .
+    ports:
+      - "3000:3001"
+      - "41233:41233"
+    environment:
+      - SERVER_LISTEN_PORT=3001
+      - SERVER_UDP_PORT=41233
+      - SERVER_IP_ADDRESS=0.0.0.0
