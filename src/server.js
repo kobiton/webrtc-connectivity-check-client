@@ -9,7 +9,7 @@ const app = express();
 let isUdpServerReady = false
 
 function main() {
-    let msg = 'Client launched with below configurations\n'
+    let msg = 'Server launched with below configurations\n'
     msg += `SERVER_LISTEN_PORT - ${SERVER_LISTEN_PORT}\n`
     msg += `SERVER_UDP_PORT - ${SERVER_UDP_PORT}\n`
     msg += `SERVER_IP_ADDRESS - ${SERVER_IP_ADDRESS}\n`

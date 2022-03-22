@@ -10,7 +10,7 @@ module.exports = class UdpServer extends EventEmitter {
     }
 
     createUdpServer = (udpPort) => {
-        if (isNaN(udpPort)) {
+        if (isNaN(udpPort) || udpPort < 0 || udpPort > 65535) {
             console.log('Invalid UDP port!');
             return
         }
