@@ -1,7 +1,6 @@
 const express = require('express')
 const isEmpty = require('lodash/isEmpty')
 const udp = require('dgram');
-const axios = require('axios')
 require('console-stamp')(console, 'HH:MM:ss.l');
 
 const SERVER_LISTEN_PORT = Number(process.env.SERVER_LISTEN_PORT) || 3000
@@ -11,7 +10,8 @@ const app = express();
 let isUdpServerReady = false
 const MESSAGE_RESPONSE_DURATION_IN_MS = 10000
 let udpServer = null
-const cachedMessage = []
+let cachedMessage = []
+let clearMessageTimeout = null
 
 /* ---------------------------------- Udp Server ---------------------------------- */
 
@@ -42,12 +42,23 @@ function createUdpServer() {
 function handleReceivedMessageFromClient(data, info) {
     const message = data.toString()
     cachedMessage.push(message)
+    const sendMessage = new Date().getTime().toString()
     console.log(`Received message from client ${info.address}:${info.port} with content: ${message}`)
-    udpServer.send(data, info.port, info.address, (error) => {
+    udpServer.send(Buffer.from(sendMessage), info.port, info.address, (error) => {
         if (error){
-            printLogs(`Some errors have occurred when sending data to ${info.address}:${info.port}. Error message: ` + error);
+            console.log(`Some errors have occurred when sending data to ${info.address}:${info.port}. Error message: ` + error);
+        }
+        else {
+            console.log(`Sent message to the udp client at address: ${info.address}:${info.port} with content: ${sendMessage}`)
         }
     });
+}
+
+function clearCachedMessage() {
+    cachedMessage = []
+    clearTimeout(clearMessageTimeout)
+    console.log('Clear cached message');
+    clearMessageTimeout = setTimeout(clearCachedMessage, 24 * 60 * 60 * 1000);
 }
 
 /* ---------------------------------- Http Server ---------------------------------- */
@@ -81,17 +92,14 @@ function createHttpServer(params) {
     });
 }
 
-function getServerPublicIpAddress() {
-    axios.get()
-}
-
-
 function main() {
     let msg = 'Server launched with below configurations\n'
     msg += `SERVER_LISTEN_PORT - ${SERVER_LISTEN_PORT}\n`
     msg += `SERVER_UDP_PORT - ${SERVER_UDP_PORT}\n`
     msg += `SERVER_IP_ADDRESS - ${SERVER_IP_ADDRESS}\n`
     console.log(msg)
+
+    clearCachedMessage()
 
     createUdpServer()
     createHttpServer()

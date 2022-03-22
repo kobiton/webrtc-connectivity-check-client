@@ -71,6 +71,9 @@ async function beginConnectivityCheck() {
         if (error){
             printLogs('Some errors have occurred when sending data: ' + error);
         }
+        else {
+            printLogs(`Sent message to the udp server at address: ${serverAddress.address}:${serverAddress.port} with content: ${sentMessage}`)
+        }
     });
 
     timeout = setTimeout(() => {
@@ -81,7 +84,6 @@ async function beginConnectivityCheck() {
     printLogs(`The client is waiting for response from Kobiton server...`)
     // Call api to verify that server received message successfully.
     const response = await getRequest(`${SERVER_URL}/message?content=${sentMessage}`)
-    console.log(response);
     if (response.statusCode === 200) {
         printLogs(`The Kobiton server is successfully received message from client!`)
     }
