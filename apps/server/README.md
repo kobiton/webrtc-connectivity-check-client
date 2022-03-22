@@ -11,5 +11,5 @@
 - Run `SERVER_LISTEN_PORT='3000' SERVER_UDP_PORT='41233' SERVER_IP_ADDRESS='localhost' npm start` to run webrtc-connectivity-check
 ### How to Deploy
 - Install docker
-- Run `docker build -t <image-name>:<image-tag>` to build docker image
-- Run `docker run -d  -e SERVER_LISTEN_PORT=3000 -e SERVER_UDP_PORT=41233 -e SERVER_IP_ADDRESS=localhost -p 3000:3000 -p 41233:41233 <image-name>:<image-tag>`
+- Go to `cd apps/server` folder
+- Run `Bash start.sh`
