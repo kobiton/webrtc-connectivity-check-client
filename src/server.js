@@ -7,7 +7,7 @@ const SERVER_UDP_PORT = Number(process.env.SERVER_UDP_PORT) || 41233
 const SERVER_IP_ADDRESS = process.env.SERVER_IP_ADDRESS || 'localhost'
 const app = express();
 let isUdpServerReady = false
-console.log(process.env);
+
 function main() {
     let msg = 'Client launched with below configurations\n'
     msg += `SERVER_LISTEN_PORT - ${SERVER_LISTEN_PORT}\n`
