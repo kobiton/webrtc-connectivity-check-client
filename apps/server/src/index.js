@@ -1,12 +1,15 @@
 const express = require('express')
 const isEmpty = require('lodash/isEmpty')
 const UdpServer = require('./udp/index')
+require('console-stamp')(console, 'HH:MM:ss.l');
 
 const SERVER_LISTEN_PORT = Number(process.env.SERVER_LISTEN_PORT) || 3000
 const SERVER_UDP_PORT = Number(process.env.SERVER_UDP_PORT) || 41233
 const SERVER_IP_ADDRESS = process.env.SERVER_IP_ADDRESS || 'localhost'
 const app = express();
 let isUdpServerReady = false
+const MESSAGE_RESPONSE_DURATION_IN_MS = 10000
+
 
 function main() {
     let msg = 'Server launched with below configurations\n'
@@ -55,11 +58,11 @@ function main() {
         
         console.log('Received message from client: ', JSON.stringify({address, port}))
         try {
-            udpServer.startStreamingData('Sample data', port, address)
+            udpServer.startStreamingData('Sample response data', port, address, MESSAGE_RESPONSE_DURATION_IN_MS)
         } catch (error) {
             res.status(500)
             res.send('Internal server error')
-            console.log(error)
+            console.error(error)
             return
         }
 

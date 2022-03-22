@@ -47,10 +47,10 @@ module.exports = class UdpServer extends EventEmitter {
 
     handleUdpMessage = (msg, info) => {
         this.printLogs(`Received upd data from ${info.address}:${info.port} with content: ${msg.toString()}`);
+        this.emit('message', {msg, info})
     }
 
-    startStreamingData = (message, port, address) => {
-        const data = Buffer.from(message)
+    startStreamingData = (message, port, address, duration) => {
         const id = `${address}:${port}`
 
         if (this.intervals[id]) {
@@ -59,18 +59,22 @@ module.exports = class UdpServer extends EventEmitter {
 
         this.printLogs('Start streaming data to client with address: ' + id);
         const interval = setInterval(() => {
-            this.server.send(data, port, address, (error) => {
-                if (error){
-                    this.printLogs('Some errors have occurred when sending data: ' + error);
-                }
-                else {
-                    this.printLogs(`Sent data to ${address}:${port} with content: ${message}`);
-                }
-            });
+            this.sendMessage(message, port, address)
         }, 1000);
         this.intervals[id] = interval
-        setTimeout(this.stopStreamingData.bind(this, id), 10000);
+        setTimeout(this.stopStreamingData.bind(this, id), duration);
+    }
 
+    sendMessage = (message, port, address) => {
+        const data = Buffer.from(message)
+        this.server.send(data, port, address, (error) => {
+            if (error){
+                this.printLogs('Some errors have occurred when sending data: ' + error);
+            }
+            else {
+                this.printLogs(`Sent data to ${address}:${port} with content: ${message}`);
+            }
+        });
     }
 
     stopStreamingData = (id) => {
