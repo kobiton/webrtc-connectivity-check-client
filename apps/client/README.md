@@ -3,7 +3,7 @@ A client app running at customer's workstation to diagnose common network issues
 # 1. Setup
 
 - Download and install [NodeJS LTS](https://nodejs.org/en/download/) accordingly with your OS. If you already have NodeJS installed, make sure your NodeJS's version is 8.0 or newer
-- Download the [apps/client/index.js](https://github.com/kobiton/webrtc-connectivity-check/blob/master/apps/client/index.js) to your machine. Let's say it's downloaded at `/tmp/` (on MacOS) or `C:/tmp/` (on Windows)
+- Download the [apps/client/index.js](https://raw.githubusercontent.com/kobiton/webrtc-connectivity-check/main/apps/client/index.js) to your machine. Let's say it's downloaded at `/tmp/` (on MacOS) or `C:/tmp/` (on Windows)
 
 # 2. Run the client app
 
