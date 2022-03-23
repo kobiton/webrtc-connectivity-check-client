@@ -8,7 +8,7 @@ const SERVER_UDP_PORT = Number(process.env.SERVER_UDP_PORT) || 41233
 const SERVER_IP_ADDRESS = process.env.SERVER_IP_ADDRESS || 'localhost'
 const app = express();
 let isUdpServerReady = false
-const MESSAGE_RESPONSE_DURATION_IN_MS = 10000
+const MESSAGE_RESPONSE_DURATION_IN_MS = 5000
 let udpServer = null
 let cachedMessage = []
 let clearMessageTimeout = null
@@ -44,14 +44,16 @@ function handleReceivedMessageFromClient(data, info) {
     cachedMessage.push(message)
     const sendMessage = new Date().getTime().toString()
     console.log(`Received message from client ${info.address}:${info.port} with content: ${message}`)
-    udpServer.send(Buffer.from(sendMessage), info.port, info.address, (error) => {
-        if (error){
-            console.log(`Some errors have occurred when sending data to ${info.address}:${info.port}. Error message: ` + error);
-        }
-        else {
-            console.log(`Sent message to the udp client at address: ${info.address}:${info.port} with content: ${sendMessage}`)
-        }
-    });
+    setTimeout(() => {
+        udpServer.send(Buffer.from(sendMessage), info.port, info.address, (error) => {
+            if (error){
+                console.log(`Some errors have occurred when sending data to ${info.address}:${info.port}. Error message: ` + error);
+            }
+            else {
+                console.log(`Sent message to the udp client at address: ${info.address}:${info.port} with content: ${sendMessage}`)
+            }
+        });
+    }, MESSAGE_RESPONSE_DURATION_IN_MS);
 }
 
 function clearCachedMessage() {

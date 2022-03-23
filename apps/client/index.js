@@ -3,13 +3,12 @@ const udp = require('dgram');
 
 const SERVER_URL = process.env.SERVER_URL || 'http://13.213.3.169'
 const CLIENT_UDP_PORT = Number(process.env.CLIENT_UDP_PORT) || 41234
-const MESSAGE_RESPONSE_TIMEOUT_IN_MS = 10000
+const MESSAGE_RESPONSE_TIMEOUT_IN_MS = 5000
 
 let udpClient = null
 const currentDate = new Date()
 let timeout = null
 let sentMessage = ''
-let sendMessageTimout = null
 
 function printLogs(message) {
     console.log(`[${currentDate.toString()}] [LOG]`, message);
@@ -23,15 +22,16 @@ function createUdpServer() {
     udpClient = udp.createSocket('udp4')
 
     udpClient.on('error', (error) => {
-        printLogs('[ERROR] Something wrong when creating udp server. Please re-run the client or inform with customer-support. Error message: ' + error);
-        udpClient.close();
+        printLogs('[ERROR] Something wrong when creating udp server. Please re-run the client or inform with customer-support. Error message: ' + error)
+        udpClient.close()
+        process.exit(-1)
     })
 
     udpClient.on('message', handleReceivedMessageFromServer)
 
     udpClient.on('listening', () => {
         const address = udpClient.address()
-        printLogs(`Started UDP client at port ${address.port}`);
+        printLogs(`Started UDP client at port ${address.port}`)
         beginConnectivityCheck()
 
     });
@@ -80,12 +80,7 @@ async function beginConnectivityCheck() {
             process.exit(-1)
         }
     });
-
-    timeout = setTimeout(() => {
-        printLogs(`The client has been waited for ${MESSAGE_RESPONSE_TIMEOUT_IN_MS} but cannot receive udp package from server! This mean that lightning mode feature is not
-        available on your machine. Please verify your firewall setup or contact to Kobiton Technical Support for more information!`);
-    }, MESSAGE_RESPONSE_TIMEOUT_IN_MS);
-    sendMessageTimout = setTimeout(async () => {
+    setTimeout(async () => {
         // Call api to verify that server received message successfully.
         const response = await getRequest(`${SERVER_URL}/message?content=${sentMessage}`)
         if (response.statusCode === 200) {
@@ -93,9 +88,16 @@ async function beginConnectivityCheck() {
         }
         else if (response.statusCode === 404) {
             printLogs('[PROBLEM FOUND] The client can NOT send the UDP packet to the Internet. Please verify with your IT departmant that: in the office, the outgoing UDP traffic with destination port range 30000-65000 is enabled on the router and/or the firewall.')
-            clearTimeout(timeout)
+            process.exit(0)
         }
-    }, 2000);
+
+        // Wait for server response.
+        timeout = setTimeout(() => {
+            printLogs(`The client has been waited for ${MESSAGE_RESPONSE_TIMEOUT_IN_MS / 1000}seconds but cannot receive udp package from server! This mean that lightning mode feature is not
+            available on your machine. Please verify your firewall setup or contact to Kobiton Technical Support for more information!`);
+        }, MESSAGE_RESPONSE_TIMEOUT_IN_MS);
+    }, 1000);
+
 }
 
 function handleReceivedMessageFromServer() {
@@ -104,7 +106,6 @@ function handleReceivedMessageFromServer() {
         timeout = null
     }
 
-    clearTimeout(sendMessageTimout)
     printLogs(`Your machine received message from Kobiton server successfully. This mean the Lightning mode feature is available now. Congratulation!`)
     process.exit(0)
 }
