@@ -6,6 +6,8 @@ services:
     build: .
     environment:
       - SERVER_IP_ADDRESS=${SERVER_IP_ADDRESS}
+      - SERVER_UDP_PORT=${SERVER_UDP_PORT}
+      - SERVER_LISTEN_PORT=${SERVER_LISTEN_PORT}
     ports:
-      - "3000:3000"
-      - "41233:41233"
+      - "${SERVER_LISTEN_PORT}:${SERVER_LISTEN_PORT}"
+      - "${SERVER_UDP_PORT}:${SERVER_UDP_PORT}"
