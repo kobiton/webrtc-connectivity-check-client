@@ -95,7 +95,9 @@ async function beginConnectivityCheck() {
 
         // Wait for server response.
         timeout = setTimeout(() => {
-            printLogs('[CHECK 2 - FAILED] The client can NOT receive the UDP packet from the Internet. Please verify with your IT departmant that: in the office, the incoming UDP traffic from the Internet with source port range 30000-65000 is enabled on the router and/or the firewall.')
+            printLogs(`[CHECK 2 - FAILED] The client can NOT receive the UDP packet from the Internet. Please verify with your IT departmant that:
+  * In the office, the incoming UDP traffic from the Internet with source port range 30000-65000 is enabled on the router and/or the firewall.
+  * In the office, the firewall / router enables Symmetric NAT (see https://en.wikipedia.org/wiki/Network_address_translation) so that the Kobiton server is able to send UDP packets to the client which is behind the firewall.`)
             bye()
         }, MESSAGE_RESPONSE_TIMEOUT_IN_MS);
     }, 1000);
