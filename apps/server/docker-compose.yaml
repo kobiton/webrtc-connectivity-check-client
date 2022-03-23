@@ -5,9 +5,9 @@ services:
     image: "webrtc-connectivity-check-server"
     build: .
     environment:
-      - SERVER_IP_ADDRESS=${SERVER_IP_ADDRESS}
-      - SERVER_UDP_PORT=${SERVER_UDP_PORT}
-      - SERVER_LISTEN_PORT=${SERVER_LISTEN_PORT}
+      - SERVER_IP_ADDRESS=${SERVER_IP_ADDRESS-localhost}
+      - SERVER_UDP_PORT=${SERVER_UDP_PORT-41233}
+      - SERVER_LISTEN_PORT=${SERVER_LISTEN_PORT-3000}
     ports:
-      - "${SERVER_LISTEN_PORT}:${SERVER_LISTEN_PORT}"
-      - "${SERVER_UDP_PORT}:${SERVER_UDP_PORT}"
+      - "${SERVER_LISTEN_PORT-3000}:${SERVER_LISTEN_PORT-3000}"
+      - "${SERVER_UDP_PORT-41233}:${SERVER_UDP_PORT-41233}"
