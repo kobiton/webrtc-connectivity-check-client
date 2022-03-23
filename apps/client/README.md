@@ -1,24 +1,36 @@
-## Prerequisite
-- Install NodeJS LST [Please download from this link](https://nodejs.org/en/download/)
-- If host machine is macOS
-    - Select the icon macOS installer
-    - Run the downloaded installer file (For example: `node-v16.14.2.pkg`) to install NodeJS
-    - You're finished! Open terminal and verify the installation with command `node --version`
-- If host machine is windows
-    - Select the icon Windows installer
-    - Run the downloaded installer file (For example: `node-v16.14.2.msi`) to install NodeJS
-    - You're finished! Open terminal and verify the installation with command `node --version`
-- If host machine is linux
-    - [Please refer to this link](https://nodejs.org/en/download/package-manager/)
-- Install [Github](https://github.com/git-guides/install-git) to download the source code
-## Getting started
-### How to run
-- Go to the [webrtc-conectivity-check repository](https://github.com/kobiton/webrtc-connectivity-check)
-- Open the terminal and make sure that 
-- Download the source code from the repository `git clone https://github.com/kobiton/webrtc-connectivity-check.git`
-- Go to the folder contains the repository.
-- Go to `cd apps/client` folder
-- Run `node index.js` to run webrtc-connectivity-check
-### How to send back the result
-- From the console, select all the text that have been printed after the command `node index.js`.
-- Copy all the selected text and send back to the Kobiton Technical support team.
+A client app running at customer's workstation to diagnose common network issues which causes the Lightning mode not running on Kobiton devices
+
+# 1. Setup
+
+- Download and install [NodeJS LST](https://nodejs.org/en/download/) accordingly with your OS. If you already have NodeJS installed, make sure your NodeJS's version is 8.0 or newer
+- Download the [apps/client/index.js] to your machine. Let's say it's downloaded at `/tmp/` (on MacOS) or `C:/tmp/` (on Windows)
+
+# 2. Run the client app
+
+> Make sure your machine stays inside the organization network i.e. in the office so that the client app can report correct network condition
+
+- Open the Terminal app (on MacOS) or Command Prompt (on Windows)
+- Navigate to the directory having the `index.js` as below
+
+```
+cd /tmp (on MacOS)
+C:/tmp (on Windows)
+```
+
+- Execute the client app as below
+
+```
+node index.js
+```
+
+- Let it runs, observe the result and take the suggested action
+
+# 3. Advanced run
+
+> This section is for Kobiton Technical Support staff
+
+The app supports below parameters (with default values) so that we can override on executing if needed
+
+- `SERVER_URL=http://13.213.3.169` : specify the server IP i.e. the `apps/server` runs there
+- `CLIENT_UDP_PORT=41234` : specifiy the port (in UDP) that the server app is listening
+

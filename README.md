@@ -1,2 +1,1 @@
-# webrtc-connectivity-check
-A simple CLI tool to check that the WebRTC can work in your network or not
+The check tool to diagnose network issues which causes Lightning mode feature on Kobiton devices not working. The tool has 02 parts: the client app running at customer's workstation and the server running at Internet to verify the network traffic

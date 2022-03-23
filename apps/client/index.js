@@ -1,19 +1,22 @@
-const http = require('http')
+const http = require('http');
 const udp = require('dgram');
-
-
 
 const SERVER_URL = process.env.SERVER_URL || 'http://13.213.3.169'
 const CLIENT_UDP_PORT = Number(process.env.CLIENT_UDP_PORT) || 41234
-let udpClient = null
 const MESSAGE_RESPONSE_TIMEOUT_IN_MS = 10000
+
+let udpClient = null
 const currentDate = new Date()
 let timeout = null
 let sentMessage = ''
 let sendMessageTimout = null
 
 function printLogs(message) {
-    console.log(`[${currentDate.toString()}] [LOG] ${message}`)
+    console.log(`[${currentDate.toString()}] [LOG]`, message);
+}
+
+function printError(err) {
+    console.error(`[${currentDate.toString()}] [ERROR]`, err.message ? err.message : err, err);
 }
 
 function createUdpServer() {
@@ -28,7 +31,7 @@ function createUdpServer() {
 
     udpClient.on('listening', () => {
         const address = udpClient.address()
-        printLogs(`Starting UDP server successfully. The UDP server is listening at ${address.address}:${address.port}`);
+        printLogs(`Started UDP client at port ${address.port}`);
         beginConnectivityCheck()
 
     });
@@ -40,7 +43,7 @@ function createUdpServer() {
     udpClient.bind(CLIENT_UDP_PORT)
 }
 
-async function getRequest(url) {
+function getRequest(url) {
     return new Promise ((resolve, reject) => {
       http.get(url, (res) => {
         const { statusCode } = res;
@@ -56,24 +59,25 @@ async function getRequest(url) {
 async function beginConnectivityCheck() {
     // Get server information (udp port, udp address)
     let serverAddress
+    const url = `${SERVER_URL}/address`
     try {
-        const response = await getRequest(`${SERVER_URL}/address`)
+        printLogs(`Calling ${url} to retrieve the Kobiton UDP server address`)
+        const response = await getRequest(url)
         serverAddress = JSON.parse(response.data)
-        printLogs(`The client is successfully received the udp server address: ${serverAddress.address}:${serverAddress.port} from Kobiton server.`)
+        printLogs(`The Kobiton UDP server is at ${serverAddress.address}:${serverAddress.port}`)
     } catch (error) {
-        printLogs('[ERROR] Something went wrong when getting server address. Please check your internet connection or send this message to technical support. Error message: ', error.message)
-        return
+        printError('Unexpected error when getting server address, please solve and try again', error)
+        process.exit(-1)
     }
     
     // Sending timestamp data to server and wait for response
     sentMessage = currentDate.getTime().toString()
     const data = Buffer.from(sentMessage)
+    printLogs(`The client is going to send one UDP packet to Kobiton UDP server at ${serverAddress.address}:${serverAddress.port}`)
     udpClient.send(data, Number(serverAddress.port), serverAddress.address, (error) => {
         if (error){
-            printLogs('Some errors have occurred when sending data: ' + error);
-        }
-        else {
-            printLogs(`Sent message to the udp server at address: ${serverAddress.address}:${serverAddress.port} with content: ${sentMessage}`)
+            printError('Unexpected error occurs when sending data. Please solve and try again' , error);
+            process.exit(-1)
         }
     });
 
@@ -81,19 +85,17 @@ async function beginConnectivityCheck() {
         printLogs(`The client has been waited for ${MESSAGE_RESPONSE_TIMEOUT_IN_MS} but cannot receive udp package from server! This mean that lightning mode feature is not
         available on your machine. Please verify your firewall setup or contact to Kobiton Technical Support for more information!`);
     }, MESSAGE_RESPONSE_TIMEOUT_IN_MS);
-    printLogs(`The client is waiting for response from Kobiton server...`)
     sendMessageTimout = setTimeout(async () => {
         // Call api to verify that server received message successfully.
         const response = await getRequest(`${SERVER_URL}/message?content=${sentMessage}`)
         if (response.statusCode === 200) {
-            printLogs(`The Kobiton server is successfully received message from client!`)
+            printLogs('The client can send the UDP packet successfully to the Internet since the Kobiton UDP server received the packet')
         }
         else if (response.statusCode === 404) {
-            printLogs(`The Kobiton server cannot received message from client. Maybe there are some blocks from your machine. Please check your firewall or contact to our technical support for more information!`)
+            printLogs('[PROBLEM FOUND] The client can NOT send the UDP packet to the Internet. Please verify with your IT departmant that: in the office, the outgoing UDP traffic with destination port range 30000-65000 is enabled on the router and/or the firewall.')
             clearTimeout(timeout)
-            return
         }
-    }, 1000);
+    }, 2000);
 }
 
 function handleReceivedMessageFromServer() {
@@ -104,13 +106,14 @@ function handleReceivedMessageFromServer() {
 
     clearTimeout(sendMessageTimout)
     printLogs(`Your machine received message from Kobiton server successfully. This mean the Lightning mode feature is available now. Congratulation!`)
+    process.exit(0)
 }
 
-async function main() {
+function main() {
     // Print envs
-    let msg = 'Client launched with below configurations\n'
-    msg += `SERVER_URL - ${SERVER_URL}\n`
-    msg += `CLIENT_UDP_PORT - ${CLIENT_UDP_PORT}\n`
+    let msg = 'The client is launched with below environment variables\n'
+    msg += `\t- SERVER_URL=${SERVER_URL}\n`
+    msg += `\t- CLIENT_UDP_PORT=${CLIENT_UDP_PORT}`
     printLogs(msg)
 
     // Create udp client.
@@ -118,3 +121,4 @@ async function main() {
 }
 
 main()
+
