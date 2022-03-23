@@ -14,15 +14,15 @@ function printLogs(message) {
     console.log(`[${currentDate.toString()}] [LOG]`, message);
 }
 
-function printError(err) {
-    console.error(`[${currentDate.toString()}] [ERROR]`, err.message ? err.message : err, err);
+function printError(message, err) {
+    console.error(`[${currentDate.toString()}] [ERROR]`, message, err.message ? err.message : err, err);
 }
 
 function createUdpServer() {
     udpClient = udp.createSocket('udp4')
 
     udpClient.on('error', (error) => {
-        printLogs('[ERROR] Something wrong when creating udp server. Please re-run the client or inform with customer-support. Error message: ' + error)
+        printError('Something wrong when creating udp server. Please re-run the client or inform with customer-support. Error message: ', error)
         udpClient.close()
         process.exit(-1)
     })
@@ -73,7 +73,8 @@ async function beginConnectivityCheck() {
     // Sending timestamp data to server and wait for response
     sentMessage = currentDate.getTime().toString()
     const data = Buffer.from(sentMessage)
-    printLogs(`The client is going to send one UDP packet to Kobiton UDP server at ${serverAddress.address}:${serverAddress.port}`)
+    printLogs('[CHECK 1] Can the client send UDP packets to the Internet ?')
+    printLogs(`The client is going to send an UDP packet to Kobiton UDP server at ${serverAddress.address}:${serverAddress.port}`)
     udpClient.send(data, Number(serverAddress.port), serverAddress.address, (error) => {
         if (error){
             printError('Unexpected error occurs when sending data. Please solve and try again' , error);
@@ -84,17 +85,18 @@ async function beginConnectivityCheck() {
         // Call api to verify that server received message successfully.
         const response = await getRequest(`${SERVER_URL}/message?content=${sentMessage}`)
         if (response.statusCode === 200) {
-            printLogs('The client can send the UDP packet successfully to the Internet since the Kobiton UDP server received the packet')
+            printLogs('[CHECK 1 - PASSED] The client can send the UDP packet successfully to the Internet since the Kobiton UDP server receives the packet')
         }
         else if (response.statusCode === 404) {
-            printLogs('[PROBLEM FOUND] The client can NOT send the UDP packet to the Internet. Please verify with your IT departmant that: in the office, the outgoing UDP traffic with destination port range 30000-65000 is enabled on the router and/or the firewall.')
-            process.exit(0)
+            printLogs('[CHECK 1 - FAILED] The client can NOT send the UDP packet to the Internet. Please verify with your IT departmant that: in the office, the outgoing UDP traffic to the Internet with destination port range 30000-65000 is enabled on the router and/or the firewall.')
         }
+        
+        printLogs('[CHECK 2] Can the client receive UDP packets from the Internet (sent by Kobiton UDP server) ?')
 
         // Wait for server response.
         timeout = setTimeout(() => {
-            printLogs(`The client has been waiting for ${MESSAGE_RESPONSE_TIMEOUT_IN_MS / 1000} seconds but cannot receive the UDP package from the server! This means that the lightning mode feature is not available on your machine. Please verify with your IT departmant that: in the office, the incomming UDP traffic is enabled on the router and/or firewall.`);
-            process.exit(0)
+            printLogs('[CHECK 2 - FAILED] The client can NOT receive the UDP packet from the Internet. Please verify with your IT departmant that: in the office, the incoming UDP traffic from the Internet with source port range 30000-65000 is enabled on the router and/or the firewall.')
+            bye()
         }, MESSAGE_RESPONSE_TIMEOUT_IN_MS);
     }, 1000);
 
@@ -106,7 +108,13 @@ function handleReceivedMessageFromServer() {
         timeout = null
     }
 
-    printLogs(`Your machine received message from Kobiton server successfully. This mean the Lightning mode feature is available now. Congratulation!`)
+    printLogs('[CHECK 2 - PASSED] The client receives an UDP packet from Kobiton UDP server.')
+    bye()
+}
+
+function bye() {
+    printLogs('')
+    printLogs("The check process completes. If you encounter any issue, please follow the suggestion, solve it and re-run again to verify it's fixed")
     process.exit(0)
 }
 
