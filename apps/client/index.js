@@ -3,13 +3,14 @@ const udp = require('dgram');
 
 
 
-const SERVER_URL = process.env.SERVER_URL || 'http://localhost:3000'
+const SERVER_URL = process.env.SERVER_URL || 'http://13.213.3.169'
 const CLIENT_UDP_PORT = Number(process.env.CLIENT_UDP_PORT) || 41234
 let udpClient = null
 const MESSAGE_RESPONSE_TIMEOUT_IN_MS = 10000
 const currentDate = new Date()
 let timeout = null
 let sentMessage = ''
+let sendMessageTimout = null
 
 function printLogs(message) {
     console.log(`[${currentDate.toString()}] [LOG] ${message}`)
@@ -80,18 +81,19 @@ async function beginConnectivityCheck() {
         printLogs(`The client has been waited for ${MESSAGE_RESPONSE_TIMEOUT_IN_MS} but cannot receive udp package from server! This mean that lightning mode feature is not
         available on your machine. Please verify your firewall setup or contact to Kobiton Technical Support for more information!`);
     }, MESSAGE_RESPONSE_TIMEOUT_IN_MS);
-
     printLogs(`The client is waiting for response from Kobiton server...`)
-    // Call api to verify that server received message successfully.
-    const response = await getRequest(`${SERVER_URL}/message?content=${sentMessage}`)
-    if (response.statusCode === 200) {
-        printLogs(`The Kobiton server is successfully received message from client!`)
-    }
-    else if (response.statusCode === 404) {
-        printLogs(`The Kobiton server cannot received message from client. Maybe there are some blocks from your machine. Please check your firewall or contact to our technical support for more information!`)
-        clearTimeout(timeout)
-        return
-    }
+    sendMessageTimout = setTimeout(async () => {
+        // Call api to verify that server received message successfully.
+        const response = await getRequest(`${SERVER_URL}/message?content=${sentMessage}`)
+        if (response.statusCode === 200) {
+            printLogs(`The Kobiton server is successfully received message from client!`)
+        }
+        else if (response.statusCode === 404) {
+            printLogs(`The Kobiton server cannot received message from client. Maybe there are some blocks from your machine. Please check your firewall or contact to our technical support for more information!`)
+            clearTimeout(timeout)
+            return
+        }
+    }, 1000);
 }
 
 function handleReceivedMessageFromServer() {
@@ -100,6 +102,7 @@ function handleReceivedMessageFromServer() {
         timeout = null
     }
 
+    clearTimeout(sendMessageTimout)
     printLogs(`Your machine received message from Kobiton server successfully. This mean the Lightning mode feature is available now. Congratulation!`)
 }
 

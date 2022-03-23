@@ -10,6 +10,6 @@
 - Run `npm install` to install all dependencies
 - Run `SERVER_LISTEN_PORT='3000' SERVER_UDP_PORT='41233' SERVER_IP_ADDRESS='localhost' npm start` to run webrtc-connectivity-check
 ### How to Deploy
-- Install docker
+- Install docker, docker-compose
 - Go to `cd apps/server` folder
-- Run `Bash start.sh`
+- Run `Bash start.sh --port 3000 --udp-port 41233` to deploy server
