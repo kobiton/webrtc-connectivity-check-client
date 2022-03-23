@@ -93,7 +93,7 @@ async function beginConnectivityCheck() {
 
         // Wait for server response.
         timeout = setTimeout(() => {
-            printLogs(`The client has been waiting for ${MESSAGE_RESPONSE_TIMEOUT_IN_MS / 1000} seconds but cannot receive the UDP package from the server! This means that the lightning mode feature is not available on your machine. Please verify your firewall setup or contact Kobiton Technical Support for more information!`);
+            printLogs(`The client has been waiting for ${MESSAGE_RESPONSE_TIMEOUT_IN_MS / 1000} seconds but cannot receive the UDP package from the server! This means that the lightning mode feature is not available on your machine. Please verify with your IT departmant that: in the office, the incomming UDP traffic is enabled on the router and/or firewall.`);
             process.exit(0)
         }, MESSAGE_RESPONSE_TIMEOUT_IN_MS);
     }, 1000);
