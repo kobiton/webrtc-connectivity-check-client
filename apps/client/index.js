@@ -1,4 +1,5 @@
 const http = require('http');
+const util = require('util');
 const udp = require('dgram');
 
 const SERVER_URL = process.env.SERVER_URL || 'http://13.213.3.169'
@@ -45,13 +46,22 @@ function createUdpServer() {
 
 function getRequest(url) {
     return new Promise ((resolve, reject) => {
+      printLogs(`Calling to ${url}`);
       http.get(url, (res) => {
-        const { statusCode } = res;
-        let data = ''
-        res.on('data', d => {data += d})
-        res.on('close', () => {resolve({data, statusCode})})
-        res.on('error', (error) => {reject(error)})
-      })
+        res.setEncoding('utf8');
+        res.payload = '';
+        res
+            .on('data', d => res.payload += d)
+            .on('end', () => {
+                printLogs(`Call completes, raw response is below:
+\t* Status: ${res.statusCode}
+\t* Headers: ${util.inspect(res.headers)}
+\t* Body payload: ${res.payload}
+`);
+                resolve(res);
+            })
+            .on('error', reject);
+      }).on('error', reject);
     });
 }
 
@@ -61,9 +71,9 @@ async function beginConnectivityCheck() {
     let serverAddress
     const url = `${SERVER_URL}/address`
     try {
-        printLogs(`Calling ${url} to retrieve the Kobiton UDP server address`)
+        printLogs(`Retrieving the Kobiton UDP server address`)
         const response = await getRequest(url)
-        serverAddress = JSON.parse(response.data)
+        serverAddress = JSON.parse(response.payload)
         printLogs(`The Kobiton UDP server is at ${serverAddress.address}:${serverAddress.port}`)
     } catch (error) {
         printError('Unexpected error when getting server address, please solve and try again', error)

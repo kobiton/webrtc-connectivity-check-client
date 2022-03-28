@@ -67,26 +67,29 @@ function clearCachedMessage() {
 function createHttpServer(params) {
     app.get('/address', (req, res) => {
         if (!isUdpServerReady) {
-            res.status(500)
-            res.send('Something went wrong. The udp server is not ready!')
-            return
+            res.status(500);
+            res.send('Something went wrong. The udp server is not ready!');
+        }
+        else {
+            res.json({
+                address: SERVER_IP_ADDRESS,
+                port: SERVER_UDP_PORT
+            });
         }
 
-        res.send({
-            address: SERVER_IP_ADDRESS,
-            port: SERVER_UDP_PORT
-        })
+        res.end();
     })
 
     app.get('/message', (req, res) => {
         const content = req.query.content
         if (!isEmpty(content) && cachedMessage.includes(content)) {
-            res.send('success')
-            return
+            res.status(200);
+        }
+        else {
+            res.status(404);
         }
 
-        res.status(404);
-        res.send('Not Found!')      
+        res.end();
     })
 
     app.listen(SERVER_LISTEN_PORT, () => {
