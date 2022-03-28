@@ -2,7 +2,7 @@ const http = require('http');
 const util = require('util');
 const udp = require('dgram');
 
-const SERVER_URL = process.env.SERVER_URL || 'http://13.213.3.169'
+const SERVER_URL = process.env.SERVER_URL || 'http://webrtc-check.kobiton.com'
 const CLIENT_UDP_PORT = Number(process.env.CLIENT_UDP_PORT) || 41234
 const MESSAGE_RESPONSE_TIMEOUT_IN_MS = 5000
 
