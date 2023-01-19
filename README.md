@@ -10,18 +10,18 @@ A NodeJS-based CLI client app runs in a computer inside the organization network
 | `webrtc-check.kobiton.com:41234`   | UDP  |   The UDP destination port that the client app uses to check the outgoing UDP packets |
 
 - Download and install [NodeJS version 8.x](https://nodejs.org/en/download/) accordingly with your OS. If you already have NodeJS installed, make sure your NodeJS's version is 8.0 or newer
-- Download the [./index.js](https://raw.githubusercontent.com/kobiton/webrtc-connectivity-check-client/main/index.js) to your machine. Let's say it's downloaded at `/tmp/` (on MacOS) or `C:/tmp/` (on Windows)
+- Download the [./index.js](https://raw.githubusercontent.com/kobiton/webrtc-connectivity-check-client/main/index.js) to your machine. Let's say it's downloaded at `/tmp/` (in macOS) or `C:/tmp/` (in Windows)
 
 # 2. Run the client app
 
-> Make sure your machine stays inside the organization network i.e. in the office so that the client app can report correct network condition
+> Make sure your computer stays inside the organization network i.e. in the office so that the client app can report correct network condition
 
-- Open the Terminal app (on MacOS) or Command Prompt (on Windows)
+- Open the Terminal app (in MacOS) or Command Prompt (in Windows)
 - Navigate to the directory having the `index.js` as below
 
 ```
-cd /tmp (on MacOS)
-C:/tmp (on Windows)
+cd /tmp (in MacOS)
+C:/tmp (in Windows)
 ```
 
 - Execute the client app as below
