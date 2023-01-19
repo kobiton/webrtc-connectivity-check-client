@@ -5,7 +5,7 @@ A NodeJS-based CLI client app runs in a computer inside the organization network
 - The client app will communicate with the server running at Kobiton Data Center. Below is the network requirement for it to work, please make sure they're in allowlist of your firewall
 
 | Destination address        | Application protocol            | Comment  |
-| --- |: --- :| --- :|
+| --- | --- | --- |
 | `webrtc-check.kobiton.com:80`      | HTTP | The web service served requests from the client app 																	|
 | `webrtc-check.kobiton.com:41234`   | UDP  |   The UDP destination port that the client app uses to check the outgoing UDP packets |
 
